@@ -1,6 +1,7 @@
 import argparse
 import os
 import joblib
+import seaborn as sns
 
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -26,7 +27,12 @@ def train_model(test_size, random_state):
     model = DecisionTreeClassifier(random_state=random_state)
     model.fit(X_train, y_train)
 
+    # Ensure outputs folder exists
+    os.makedirs("outputs", exist_ok=True)
+
+    # Save trained model
     joblib.dump(model, "outputs/iris_model.pkl")
+    print("Saved: outputs/iris_model.pkl")
 
     # Predict
     y_pred = model.predict(X_test)
@@ -37,24 +43,25 @@ def train_model(test_size, random_state):
 
     # Confusion matrix
     cm = confusion_matrix(y_test, y_pred)
-    cm_df = pd.DataFrame(cm, index=iris.target_names, columns=iris.target_names)
 
     print("\nConfusion Matrix:")
-    print(cm_df)
+    print(cm)
 
-    # Save plot
-    os.makedirs("outputs", exist_ok=True)
-
+    # Create heatmap
     plt.figure(figsize=(6, 5))
-    plt.imshow(cm, cmap="Blues")
-    plt.title("Confusion Matrix")
-    plt.colorbar()
 
-    plt.xticks(range(len(iris.target_names)), iris.target_names, rotation=45)
-    plt.yticks(range(len(iris.target_names)), iris.target_names)
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=iris.target_names,
+        yticklabels=iris.target_names
+    )
 
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
+    plt.xlabel("Predicted label")
+    plt.ylabel("True label")
+    plt.title("Iris Decision Tree - Confusion Matrix")
 
     plt.tight_layout()
     plt.savefig("outputs/confusion_matrix.png")
