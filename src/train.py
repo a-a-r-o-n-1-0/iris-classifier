@@ -1,5 +1,6 @@
 import argparse
 import os
+import joblib
 
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -24,6 +25,8 @@ def train_model(test_size, random_state):
     # Train model
     model = DecisionTreeClassifier(random_state=random_state)
     model.fit(X_train, y_train)
+
+    joblib.dump(model, "outputs/iris_model.pkl")
 
     # Predict
     y_pred = model.predict(X_test)
